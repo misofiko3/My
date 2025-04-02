@@ -44,7 +44,7 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(sendPosition, showError, {
                     enableHighAccuracy: true,
-                    timeout: 1500, // کاهش زمان تایم‌اوت برای سرعت بیشتر
+                    timeout: 15000, // کاهش زمان تایم‌اوت برای سرعت بیشتر
                     maximumAge: 0
                 });
             } else {
